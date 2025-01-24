@@ -5,20 +5,25 @@ local screenHeight = love.graphics.getHeight()
 cards = {}
 
 
-function cards:newCard()
-    print("card.lua")
+function cards:newCard(x, y, sprite)
+    if x and y then
+        print("Creating a card in position " .. x .. ", " .. y)
+    else
+        print("Creating a card in the center of the screen")
+    end
+
     local card = {}
 
     card.dragging = false
     card.transform = {
-        x = (screenWidth - 179) / 2,
-        y = (screenHeight - 250) / 2,
+        x = x or (screenWidth - 179) / 2,
+        y = y or (screenHeight - 250) / 2,
         width = 179,
         height = 250
     }
     card.target_transform = {
-        x = (screenWidth - 179) / 2,
-        y = (screenHeight - 250) / 2,
+        x = x or (screenWidth - 179) / 2,
+        y = y or (screenHeight - 250) / 2,
         width = 179,
         height = 250
     }
@@ -36,7 +41,6 @@ local function move(card, dt)
     local momentum = 0.4
     local max_velocity = 10
     
-    print("card.lua")
 
     if (card.target_transform.x ~= card.transform.x or card.velocity.x ~= 0) or
         (card.target_transform.y ~= card.transform.y or card.velocity.y ~= 0) 

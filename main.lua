@@ -15,6 +15,8 @@ function love.load()
     print("Creating a new card...")
     cards:newCard()
 
+    cards:newCard(0, 0)
+
 end
 
 function love.draw()
