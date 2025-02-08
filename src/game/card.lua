@@ -1,62 +1,55 @@
 local screenWidth = love.graphics.getWidth()
 local screenHeight = love.graphics.getHeight()
 
+
+--[[
+    Pour recuperer l'objet sur lequel on focus :
+    - recupérer la liste des objets avec laquelle le curseur est en collision
+    - on loop parmi les differents objets en collision et on retourne le premier (celui le plus haut)
+    - Lorsque l'on drag on ajout une variable dragging afin de pouvoir n'activer le hovering que si l'objet n'est pas en train d'etre drag
+
+    Dans l'update on aura :
+        --Reset all collision states, get every node that collides with the cursor, then update the focus and hover targets
+        self:get_cursor_collision(G.CURSOR.T)
+        self:set_cursor_hover()
+        if self.L_cursor_queue then 
+            self:L_cursor_press(self.L_cursor_queue.x, self.L_cursor_queue.y)
+            self.L_cursor_queue = nil
+        end
+
+        Fonction utiles :
+        set_cursor_hover() : defini l'objet actuellement en hover en recuperant le premier objet de la liste des objets en collision
+        get_cursor_collision() : recupere la liste des objets en collision avec le curseur en regardant dans la liste des objet dessiné à lécran, quel objet est en collision avec l'emplacemnt du curseur
+        collides_with_point(point) : determine si le node (objet) est en collision avec un point donné
+            if _p.x >= T.x - _b and _p.y >= T.y - _b and _p.x <= T.x + T.w + _b and _p.y <= T.y + T.h + _b then 
+                return true
+            end
+]]
+
 --list of the different cards instanciated
-cards = {}
+Card = Moveable:extend()
 
+function Card:init(X, Y, W, H, card, params)
+    self.params = params
 
-function cards:newCard(x, y, sprite)
-    if x and y then
-        print("Creating a card in position " .. x .. ", " .. y)
-    else
-        print("Creating a card in the center of the screen")
-    end
+    Moveable:init(self, X, Y, W, H)
 
-    local card = {}
-
-    card.dragging = false
-    card.transform = {
-        x = x or (screenWidth - 179) / 2,
-        y = y or (screenHeight - 250) / 2,
-        width = 179,
-        height = 250
+    self.CT = self.VT
+    self.config = {
+        card = card or {}
     }
-    card.target_transform = {
-        x = x or (screenWidth - 179) / 2,
-        y = y or (screenHeight - 250) / 2,
-        width = 179,
-        height = 250
-    }
-    card.velocity = {
-        x = 0,
-        y = 0
-    }
-    card.sprite = love.graphics.newImage("assets/backCard.png")
-    
-    table.insert(cards, card)
+
+    --might be factoried in another function or might even create a Sprite object in the engine
+    --just loading temp image for now
+    self.spritePath = card.spritePath
+
 end
 
--- Function to move the card to the target position
-local function move(card, dt)
-    local momentum = 0.4
-    local max_velocity = 10
-    
-
-    if (card.target_transform.x ~= card.transform.x or card.velocity.x ~= 0) or
-        (card.target_transform.y ~= card.transform.y or card.velocity.y ~= 0) 
-    then
-        card.velocity.x = momentum * card.velocity.x +
-            (1 - momentum) * (card.target_transform.x - card.transform.x) * 30 * dt
-        card.velocity.y = momentum * card.velocity.y +
-            (1 - momentum) * (card.target_transform.y - card.transform.y) * 30 * dt
-        card.transform.x = card.transform.x + card.velocity.x
-        card.transform.y = card.transform.y + card.velocity.y
-
-        
-
-    end
-
+function Card:move(dt)
+    Moveable.move(self, dt)
 end
+
+
 
 function cards:draw(cardarg)
    
